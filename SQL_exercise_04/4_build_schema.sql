@@ -11,7 +11,7 @@ CREATE TABLE MovieTheaters (
   Name VARCHAR(255) NOT NULL,
   Movie INTEGER,  
     FOREIGN KEY (Movie) REFERENCES Movies(Code)
-) ENGINE=INNODB;
+);
 
 INSERT INTO Movies(Code,Title,Rating) VALUES(1,'Citizen Kane','PG');
  INSERT INTO Movies(Code,Title,Rating) VALUES(2,'Singin'' in the Rain','G');

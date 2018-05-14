@@ -10,14 +10,23 @@ Create table Projects (
   Hours int,
   Primary Key (Code)
 );
-	
-create table AssignedTo (
-  Scientist int not null,
-  Project char(4) not null,
-  Primary Key (Scientist, Project),
-  Foreign Key (Scientist) references Scientists (SSN),
-  Foreign Key (Project) references Projects (Code)
+
+-- MySQL
+-- create table AssignedTo (
+--   Scientist int not null,
+--   Project char(4) not null,
+--   Primary Key (Scientist, Project),
+--   Foreign Key (Scientist) references Scientists (SSN),
+--   Foreign Key (Project) references Projects (Code)
+-- );
+
+-- SQLite
+Create table AssignedTo (
+Scientist INTEGER,
+Project VARCHAR(4),
+PRIMARY KEY(Scientist, Project)
 );
+
 
 INSERT INTO Scientists(SSN,Name) 
   VALUES(123234877,'Michael Rogers'),

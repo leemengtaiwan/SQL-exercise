@@ -1,3 +1,7 @@
+-- noinspection SqlDialectInspectionForFile
+
+-- noinspection SqlNoDataSourceInspectionForFile
+
 -- LINK: https://en.wikibooks.org/wiki/SQL_Exercises/The_computer_store
 
 CREATE TABLE Manufacturers (
@@ -11,9 +15,9 @@ CREATE TABLE Products (
   Name VARCHAR(255) NOT NULL ,
   Price DECIMAL NOT NULL ,
   Manufacturer INTEGER NOT NULL,
-  PRIMARY KEY (Code), 
+  PRIMARY KEY (Code),
   FOREIGN KEY (Manufacturer) REFERENCES Manufacturers(Code)
-) ENGINE=INNODB;
+);
 
 INSERT INTO Manufacturers(Code,Name) VALUES(1,'Sony');
 INSERT INTO Manufacturers(Code,Name) VALUES(2,'Creative Labs');

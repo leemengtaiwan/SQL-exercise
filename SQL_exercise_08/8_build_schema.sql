@@ -1,166 +1,146 @@
--- https://en.wikibooks.org/wiki/SQL_Exercises/The_Hospital
-
-DROP TABLE IF EXISTS Physician;
 CREATE TABLE Physician (
-  EmployeeID INTEGER NOT NULL,
-  Name VARCHAR(30) NOT NULL,
-  Position VARCHAR(30) NOT NULL,
-  SSN INTEGER NOT NULL,
-  CONSTRAINT pk_physician PRIMARY KEY(EmployeeID)
-); 
-
-DROP TABLE IF EXISTS Department;
-CREATE TABLE Department (
-  DepartmentID INTEGER NOT NULL,
-  Name VARCHAR(30) NOT NULL,
-  Head INTEGER NOT NULL,
-  CONSTRAINT pk_Department PRIMARY KEY(DepartmentID),
-  CONSTRAINT fk_Department_Physician_EmployeeID FOREIGN KEY(Head) REFERENCES Physician(EmployeeID)
+  EmployeeID INTEGER PRIMARY KEY NOT NULL,
+  Name TEXT NOT NULL,
+  Position TEXT NOT NULL,
+  SSN INTEGER NOT NULL
 );
 
+CREATE TABLE Department (
+  DepartmentID INTEGER PRIMARY KEY NOT NULL,
+  Name TEXT NOT NULL,
+  Head INTEGER NOT NULL
+    CONSTRAINT fk_Physician_EmployeeID REFERENCES Physician(EmployeeID)
+);
 
-DROP TABLE IF EXISTS Affiliated_With;
 CREATE TABLE Affiliated_With (
-  Physician INTEGER NOT NULL,
-  Department INTEGER NOT NULL,
+  Physician INTEGER NOT NULL
+    CONSTRAINT fk_Physician_EmployeeID REFERENCES Physician(EmployeeID),
+  Department INTEGER NOT NULL
+    CONSTRAINT fk_Department_DepartmentID REFERENCES Department(DepartmentID),
   PrimaryAffiliation BOOLEAN NOT NULL,
-  CONSTRAINT fk_Affiliated_With_Physician_EmployeeID FOREIGN KEY(Physician) REFERENCES Physician(EmployeeID),
-  CONSTRAINT fk_Affiliated_With_Department_DepartmentID FOREIGN KEY(Department) REFERENCES Department(DepartmentID),
   PRIMARY KEY(Physician, Department)
 );
 
-DROP TABLE IF EXISTS Procedures;
-CREATE TABLE Procedures (
+CREATE TABLE Procedure (
   Code INTEGER PRIMARY KEY NOT NULL,
-  Name VARCHAR(30) NOT NULL,
+  Name TEXT NOT NULL,
   Cost REAL NOT NULL
 );
 
-DROP TABLE IF EXISTS Trained_In;
 CREATE TABLE Trained_In (
-  Physician INTEGER NOT NULL,
-  Treatment INTEGER NOT NULL,
+  Physician INTEGER NOT NULL
+    CONSTRAINT fk_Physician_EmployeeID REFERENCES Physician(EmployeeID),
+  Treatment INTEGER NOT NULL
+    CONSTRAINT fk_Procedure_Code REFERENCES Procedure(Code),
   CertificationDate DATETIME NOT NULL,
   CertificationExpires DATETIME NOT NULL,
-  CONSTRAINT fk_Trained_In_Physician_EmployeeID FOREIGN KEY(Physician) REFERENCES Physician(EmployeeID),
-  CONSTRAINT fk_Trained_In_Procedures_Code FOREIGN KEY(Treatment) REFERENCES Procedures(Code),
   PRIMARY KEY(Physician, Treatment)
 );
 
-DROP TABLE IF EXISTS Patient;
 CREATE TABLE Patient (
   SSN INTEGER PRIMARY KEY NOT NULL,
-  Name VARCHAR(30) NOT NULL,
-  Address VARCHAR(30) NOT NULL,
-  Phone VARCHAR(30) NOT NULL,
+  Name TEXT NOT NULL,
+  Address TEXT NOT NULL,
+  Phone TEXT NOT NULL,
   InsuranceID INTEGER NOT NULL,
-  PCP INTEGER NOT NULL,
-  CONSTRAINT fk_Patient_Physician_EmployeeID FOREIGN KEY(PCP) REFERENCES Physician(EmployeeID)
+  PCP INTEGER NOT NULL
+    CONSTRAINT fk_Physician_EmployeeID REFERENCES Physician(EmployeeID)
 );
 
-DROP TABLE IF EXISTS Nurse;
 CREATE TABLE Nurse (
   EmployeeID INTEGER PRIMARY KEY NOT NULL,
-  Name VARCHAR(30) NOT NULL,
-  Position VARCHAR(30) NOT NULL,
+  Name TEXT NOT NULL,
+  Position TEXT NOT NULL,
   Registered BOOLEAN NOT NULL,
   SSN INTEGER NOT NULL
 );
 
-DROP TABLE IF EXISTS Appointment;
 CREATE TABLE Appointment (
   AppointmentID INTEGER PRIMARY KEY NOT NULL,
-  Patient INTEGER NOT NULL,    
-  PrepNurse INTEGER,
-  Physician INTEGER NOT NULL,
+  Patient INTEGER NOT NULL
+    CONSTRAINT fk_Patient_SSN REFERENCES Patient(SSN),
+  PrepNurse INTEGER
+    CONSTRAINT fk_Nurse_EmployeeID REFERENCES Nurse(EmployeeID),
+  Physician INTEGER NOT NULL
+    CONSTRAINT fk_Physician_EmployeeID REFERENCES Physician(EmployeeID),
   Start DATETIME NOT NULL,
   End DATETIME NOT NULL,
-  ExaminationRoom TEXT NOT NULL,
-  CONSTRAINT fk_Appointment_Patient_SSN FOREIGN KEY(Patient) REFERENCES Patient(SSN),
-  CONSTRAINT fk_Appointment_Nurse_EmployeeID FOREIGN KEY(PrepNurse) REFERENCES Nurse(EmployeeID),
-  CONSTRAINT fk_Appointment_Physician_EmployeeID FOREIGN KEY(Physician) REFERENCES Physician(EmployeeID)
+  ExaminationRoom TEXT NOT NULL
 );
 
-DROP TABLE IF EXISTS Medication;
 CREATE TABLE Medication (
   Code INTEGER PRIMARY KEY NOT NULL,
-  Name VARCHAR(30) NOT NULL,
-  Brand VARCHAR(30) NOT NULL,
-  Description VARCHAR(30) NOT NULL
+  Name TEXT NOT NULL,
+  Brand TEXT NOT NULL,
+  Description TEXT NOT NULL
 );
 
-
-DROP TABLE IF EXISTS Prescribes;
 CREATE TABLE Prescribes (
-  Physician INTEGER NOT NULL,
-  Patient INTEGER NOT NULL, 
-  Medication INTEGER NOT NULL, 
+  Physician INTEGER NOT NULL
+    CONSTRAINT fk_Physician_EmployeeID REFERENCES Physician(EmployeeID),
+  Patient INTEGER NOT NULL
+    CONSTRAINT fk_Patient_SSN REFERENCES Patient(SSN),
+  Medication INTEGER NOT NULL
+    CONSTRAINT fk_Medication_Code REFERENCES Medication(Code),
   Date DATETIME NOT NULL,
-  Appointment INTEGER,  
-  Dose VARCHAR(30) NOT NULL,
-  PRIMARY KEY(Physician, Patient, Medication, Date),
-  CONSTRAINT fk_Prescribes_Physician_EmployeeID FOREIGN KEY(Physician) REFERENCES Physician(EmployeeID),
-  CONSTRAINT fk_Prescribes_Patient_SSN FOREIGN KEY(Patient) REFERENCES Patient(SSN),
-  CONSTRAINT fk_Prescribes_Medication_Code FOREIGN KEY(Medication) REFERENCES Medication(Code),
-  CONSTRAINT fk_Prescribes_Appointment_AppointmentID FOREIGN KEY(Appointment) REFERENCES Appointment(AppointmentID)
+  Appointment INTEGER
+    CONSTRAINT fk_Appointment_AppointmentID REFERENCES Appointment(AppointmentID),
+  Dose TEXT NOT NULL,
+  PRIMARY KEY(Physician, Patient, Medication, Date)
 );
 
-DROP TABLE IF EXISTS Block;
 CREATE TABLE Block (
-  BlockFloor INTEGER NOT NULL,
-  BlockCode INTEGER NOT NULL,
-  PRIMARY KEY(BlockFloor, BlockCode)
-); 
+  Floor INTEGER NOT NULL,
+  Code INTEGER NOT NULL,
+  PRIMARY KEY(Floor, Code)
+);
 
-DROP TABLE IF EXISTS Room;
 CREATE TABLE Room (
-  RoomNumber INTEGER PRIMARY KEY NOT NULL,
-  RoomType VARCHAR(30) NOT NULL,
-  BlockFloor INTEGER NOT NULL,  
-  BlockCode INTEGER NOT NULL,  
-  Unavailable BOOLEAN NOT NULL,
-  CONSTRAINT fk_Room_Block_PK FOREIGN KEY(BlockFloor, BlockCode) REFERENCES Block(BlockFloor, BlockCode)
+  Number INTEGER PRIMARY KEY NOT NULL,
+  Type TEXT NOT NULL,
+  BlockFloor INTEGER NOT NULL
+    CONSTRAINT fk_Block_Floor REFERENCES Block(Floor),
+  BlockCode INTEGER NOT NULL
+    CONSTRAINT fk_Block_Code REFERENCES Block(Code),
+  Unavailable BOOLEAN NOT NULL
 );
 
-DROP TABLE IF EXISTS On_Call;
 CREATE TABLE On_Call (
-  Nurse INTEGER NOT NULL,
-  BlockFloor INTEGER NOT NULL, 
-  BlockCode INTEGER NOT NULL,
-  OnCallStart DATETIME NOT NULL,
-  OnCallEnd DATETIME NOT NULL,
-  PRIMARY KEY(Nurse, BlockFloor, BlockCode, OnCallStart, OnCallEnd),
-  CONSTRAINT fk_OnCall_Nurse_EmployeeID FOREIGN KEY(Nurse) REFERENCES Nurse(EmployeeID),
-  CONSTRAINT fk_OnCall_Block_Floor FOREIGN KEY(BlockFloor, BlockCode) REFERENCES Block(BlockFloor, BlockCode) 
+  Nurse INTEGER NOT NULL
+    CONSTRAINT fk_Nurse_EmployeeID REFERENCES Nurse(EmployeeID),
+  BlockFloor INTEGER NOT NULL
+    CONSTRAINT fk_Block_Floor REFERENCES Block(Floor),
+  BlockCode INTEGER NOT NULL
+    CONSTRAINT fk_Block_Code REFERENCES Block(Code),
+  Start DATETIME NOT NULL,
+  End DATETIME NOT NULL,
+  PRIMARY KEY(Nurse, BlockFloor, BlockCode, Start, End)
 );
 
-DROP TABLE IF EXISTS Stay;
 CREATE TABLE Stay (
   StayID INTEGER PRIMARY KEY NOT NULL,
-  Patient INTEGER NOT NULL,
-  Room INTEGER NOT NULL,
-  StayStart DATETIME NOT NULL,
-  StayEnd DATETIME NOT NULL,
-  CONSTRAINT fk_Stay_Patient_SSN FOREIGN KEY(Patient) REFERENCES Patient(SSN),
-  CONSTRAINT fk_Stay_Room_Number FOREIGN KEY(Room) REFERENCES Room(RoomNumber)
+  Patient INTEGER NOT NULL
+    CONSTRAINT fk_Patient_SSN REFERENCES Patient(SSN),
+  Room INTEGER NOT NULL
+    CONSTRAINT fk_Room_Number REFERENCES Room(Number),
+  Start DATETIME NOT NULL,
+  End DATETIME NOT NULL
 );
 
-DROP TABLE IF EXISTS Undergoes;
 CREATE TABLE Undergoes (
-  Patient INTEGER NOT NULL,
-  Procedures INTEGER NOT NULL,
-  Stay INTEGER NOT NULL,
-  DateUndergoes DATETIME NOT NULL,
-  Physician INTEGER NOT NULL,
-  AssistingNurse INTEGER,
-  PRIMARY KEY(Patient, Procedures, Stay, DateUndergoes),
-  CONSTRAINT fk_Undergoes_Patient_SSN FOREIGN KEY(Patient) REFERENCES Patient(SSN),
-  CONSTRAINT fk_Undergoes_Procedures_Code FOREIGN KEY(Procedures) REFERENCES Procedures(Code),
-  CONSTRAINT fk_Undergoes_Stay_StayID FOREIGN KEY(Stay) REFERENCES Stay(StayID),
-  CONSTRAINT fk_Undergoes_Physician_EmployeeID FOREIGN KEY(Physician) REFERENCES Physician(EmployeeID),
-  CONSTRAINT fk_Undergoes_Nurse_EmployeeID FOREIGN KEY(AssistingNurse) REFERENCES Nurse(EmployeeID)
+  Patient INTEGER NOT NULL
+    CONSTRAINT fk_Patient_SSN REFERENCES Patient(SSN),
+  Procedure INTEGER NOT NULL
+    CONSTRAINT fk_Procedure_Code REFERENCES Procedure(Code),
+  Stay INTEGER NOT NULL
+    CONSTRAINT fk_Stay_StayID REFERENCES Stay(StayID),
+  Date DATETIME NOT NULL,
+  Physician INTEGER NOT NULL
+    CONSTRAINT fk_Physician_EmployeeID REFERENCES Physician(EmployeeID),
+  AssistingNurse INTEGER
+    CONSTRAINT fk_Nurse_EmployeeID REFERENCES Nurse(EmployeeID),
+  PRIMARY KEY(Patient, Procedure, Stay, Date)
 );
-
 
 INSERT INTO Physician VALUES(1,'John Dorian','Staff Internist',111111111);
 INSERT INTO Physician VALUES(2,'Elliot Reid','Attending Physician',222222222);
@@ -188,13 +168,13 @@ INSERT INTO Affiliated_With VALUES(7,2,1);
 INSERT INTO Affiliated_With VALUES(8,1,1);
 INSERT INTO Affiliated_With VALUES(9,3,1);
 
-INSERT INTO Procedures VALUES(1,'Reverse Rhinopodoplasty',1500.0);
-INSERT INTO Procedures VALUES(2,'Obtuse Pyloric Recombobulation',3750.0);
-INSERT INTO Procedures VALUES(3,'Folded Demiophtalmectomy',4500.0);
-INSERT INTO Procedures VALUES(4,'Complete Walletectomy',10000.0);
-INSERT INTO Procedures VALUES(5,'Obfuscated Dermogastrotomy',4899.0);
-INSERT INTO Procedures VALUES(6,'Reversible Pancreomyoplasty',5600.0);
-INSERT INTO Procedures VALUES(7,'Follicular Demiectomy',25.0);
+INSERT INTO Procedure VALUES(1,'Reverse Rhinopodoplasty',1500.0);
+INSERT INTO Procedure VALUES(2,'Obtuse Pyloric Recombobulation',3750.0);
+INSERT INTO Procedure VALUES(3,'Folded Demiophtalmectomy',4500.0);
+INSERT INTO Procedure VALUES(4,'Complete Walletectomy',10000.0);
+INSERT INTO Procedure VALUES(5,'Obfuscated Dermogastrotomy',4899.0);
+INSERT INTO Procedure VALUES(6,'Reversible Pancreomyoplasty',5600.0);
+INSERT INTO Procedure VALUES(7,'Follicular Demiectomy',25.0);
 
 INSERT INTO Patient VALUES(100000001,'John Smith','42 Foobar Lane','555-0256',68476213,1);
 INSERT INTO Patient VALUES(100000002,'Grace Ritchie','37 Snafu Drive','555-0512',36546321,2);

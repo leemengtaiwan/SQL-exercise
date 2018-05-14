@@ -9,24 +9,24 @@ CREATE TABLE Providers (
  PRIMARY KEY NOT NULL,  
  Name TEXT NOT NULL 
  );
-CREATE TABLE Provides (
- Piece INTEGER, 
- FOREIGN KEY (Piece) REFERENCES Pieces(Code),
- Provider VARCHAR(40), 
- FOREIGN KEY (Provider) REFERENCES Providers(Code),  
- Price INTEGER NOT NULL,
- PRIMARY KEY(Piece, Provider) 
- );
+
+-- MySQL
+-- CREATE TABLE Provides (
+--  Piece INTEGER,
+--  FOREIGN KEY (Piece) REFERENCES Pieces(Code),
+--  Provider VARCHAR(40),
+--  FOREIGN KEY (Provider) REFERENCES Providers(Code),
+--  Price INTEGER NOT NULL,
+--  PRIMARY KEY(Piece, Provider)
+--  );
  
 -- alternative one for SQLite
-  /* 
- CREATE TABLE Provides (
- Piece INTEGER,
- Provider VARCHAR(40),  
- Price INTEGER NOT NULL,
- PRIMARY KEY(Piece, Provider) 
- );
- */
+CREATE TABLE Provides (
+Piece INTEGER,
+Provider VARCHAR(40),
+Price INTEGER NOT NULL,
+PRIMARY KEY(Piece, Provider)
+);
  
  
 INSERT INTO Providers(Code, Name) VALUES('HAL','Clarke Enterprises');

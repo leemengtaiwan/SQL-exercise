@@ -121,3 +121,17 @@ DELETE FROM Provides WHERE provider = 'RBT' AND Piece = 4;
 -- (the provider should still remain in the database).
 DELETE FROM provides
 WHERE Provider = 'RBT';
+
+
+
+
+
+-- test
+
+SELECT outlet_id
+FROM marketenterprise.shouhin_daichou
+WHERE admin.outlet_status = "sold"
+GROUP BY 1
+
+
+
